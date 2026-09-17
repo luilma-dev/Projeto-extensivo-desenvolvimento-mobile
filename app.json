@@ -1,0 +1,20 @@
+{
+  "expo": {
+    "name": "TruckFlow",
+    "slug": "TruckFlow",
+    "version": "2.1.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "userInterfaceStyle": "light",
+    "android": {
+      "package": "com.fredexs123.TruckFlow",
+      "adaptiveIcon": {
+        "backgroundColor": "#F2F2F7",
+        "foregroundImage": "./assets/images/android-icon-foreground.png",
+        "backgroundImage": "./assets/images/android-icon-background.png",
+        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+      }
+    },
+    "web": { "favicon": "./assets/images/favicon.png" }
+  }
+}
