@@ -16,6 +16,16 @@ Se aparecer incompatibilidade, confira se o Expo Go instalado suporta SDK 57 e s
 
 Para testar no navegador: `npm run web`. Para conferir os tipos: `npm run typecheck`.
 
+## Gerar APK para Android
+
+O projeto está vinculado ao EAS Build e possui o perfil `apk` em `eas.json`. Para solicitar uma nova compilação instalável, entre na conta Expo configurada e execute:
+
+```bash
+npm run build:apk
+```
+
+O EAS exibe um link para acompanhar e baixar o arquivo `.apk` quando a compilação terminar. Esse formato pode ser instalado diretamente no Android; para publicação na Play Store, o formato recomendado é `.aab`.
+
 ## O que demonstrar
 
 - Início: quantidade de veículos, serviços pendentes, faturamento, custos e lucro das ordens concluídas.

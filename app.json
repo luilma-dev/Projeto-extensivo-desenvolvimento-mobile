@@ -15,6 +15,14 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       }
     },
-    "web": { "favicon": "./assets/images/favicon.png" }
+    "web": {
+      "favicon": "./assets/images/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "7055c825-729f-44ac-a926-797a726e923b"
+      }
+    },
+    "owner": "fredexs123"
   }
 }
