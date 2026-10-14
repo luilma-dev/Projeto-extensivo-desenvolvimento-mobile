@@ -6,7 +6,7 @@ import { styles as s } from '../styles';
 const ADMIN_EMAIL = 'admin@gmail.com';
 const ADMIN_PASSWORD = '123456';
 
-export function LoginScreen({ onLogin }: { onLogin: () => void }) {
+export function LoginScreen({ onLogin }: { onLogin: (email: string) => void }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -25,7 +25,7 @@ export function LoginScreen({ onLogin }: { onLogin: () => void }) {
     }
 
     setError('');
-    onLogin();
+    onLogin(normalizedEmail);
   }
 
   return <KeyboardAvoidingView style={s.loginPage} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
@@ -43,7 +43,7 @@ export function LoginScreen({ onLogin }: { onLogin: () => void }) {
         <Button title="Entrar" onPress={login} />
       </View>
 
-      <Text style={s.loginFooter}>Acesso administrativo · TruckFlow</Text>
+      <Text style={s.loginFooter}>Acesso administrativo · TruckFlow{'\n'}Você continuará conectado ao reabrir o app.</Text>
     </ScrollView>
   </KeyboardAvoidingView>;
 }
