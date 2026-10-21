@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Alert, Platform, ScrollView, Text, TextInput, View } from 'react-native';
 import { Vehicle } from '../data';
 import { Button, Field, FormModal, IconButton } from '../components';
+import { FipePicker } from '../FipePicker';
 import { styles as s } from '../styles';
 
 export function FleetScreen({ vehicles, onAdd, onRemove }: { vehicles: Vehicle[]; onAdd: (vehicle: Omit<Vehicle, 'id'>) => void; onRemove: (id: number) => void }) {
@@ -67,6 +68,7 @@ export function FleetScreen({ vehicles, onAdd, onRemove }: { vehicles: Vehicle[]
       <Text style={s.subtitle}>Só três informações para começar.</Text>
       <Field label="Placa" value={plate} onChangeText={setPlate} uppercase />
       <Field label="Marca e modelo" value={model} onChangeText={setModel} />
+      <FipePicker onSelect={setModel} />
       <Field label="Nome do cliente" value={owner} onChangeText={setOwner} />
       {!!error && <Text accessibilityRole="alert" style={s.error}>{error}</Text>}
       <Button title="Salvar veículo" onPress={save} />
