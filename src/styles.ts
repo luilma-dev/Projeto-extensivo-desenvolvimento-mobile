@@ -58,4 +58,11 @@ export const styles = StyleSheet.create({
   loginSubtitle: { width: '100%', fontSize: 16, color: colors.muted, lineHeight: 23, textAlign: 'center', flexShrink: 0 },
   loginCard: { backgroundColor: '#FFFFFF', borderRadius: 24, padding: 22, gap: 18 },
   loginFooter: { fontSize: 13, color: colors.muted, textAlign: 'center' },
+  splash: { flex: 1, backgroundColor: colors.background, alignItems: 'center', justifyContent: 'center', gap: 16, padding: 24 },
+  offlineBanner: { backgroundColor: '#FFF4DF', paddingVertical: 10, paddingHorizontal: 16 },
+  offlineText: { color: '#895700', fontSize: 13, fontWeight: '600', textAlign: 'center' },
+  syncing: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, minHeight: 50, borderRadius: 16, backgroundColor: '#EAF2FF' },
+  fipeBox: { backgroundColor: '#F8FAFC', borderRadius: 16, borderWidth: 1, borderColor: '#E2E8F0', padding: 14, gap: 10 },
+  fipeList: { maxHeight: 220 },
+  fipeItem: { paddingVertical: 10, paddingHorizontal: 12, borderRadius: 10, borderBottomWidth: 1, borderBottomColor: '#E2E8F0' },
 });

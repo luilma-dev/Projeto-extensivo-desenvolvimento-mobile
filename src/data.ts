@@ -1,4 +1,5 @@
-// Dados fictícios: voltam ao estado inicial quando o aplicativo é recarregado.
+// Tipos do domínio e dados fictícios usados apenas para popular o banco
+// local (SQLite) na primeira execução do aplicativo.
 export type Vehicle = { id: number; plate: string; model: string; owner: string };
 export type Status = 'Aberta' | 'Em andamento' | 'Concluída';
 export type Order = {
@@ -11,6 +12,11 @@ export type Order = {
   costCents: number;
 };
 export type Tab = 'Início' | 'Frota' | 'Ordens';
+
+/** Fila de sincronização (outbox): alterações locais aguardando envio à API. */
+export type SyncEntity = 'vehicle' | 'order';
+export type SyncAction = 'create' | 'update' | 'delete';
+export type SyncItem = { id: number; entity: SyncEntity; action: SyncAction; payload: Record<string, unknown>; createdAt: string };
 
 export function formatBRL(cents: number) {
   return new Intl.NumberFormat('pt-BR', {

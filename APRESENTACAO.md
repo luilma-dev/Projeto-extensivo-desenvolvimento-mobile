@@ -1,179 +1,100 @@
-# Apresentação do TruckFlow — quatro integrantes
+# Apresentação do TruckFlow (Sprint 3) — Quatro Integrantes (Cauê, Cauã, Alexandre e Vinícius)
 
-Duração sugerida: 7 a 10 minutos, com aproximadamente 2 minutos para cada integrante. Ensaiem usando o mesmo celular que será usado na apresentação.
+Duração sugerida: 8 a 10 minutos (~2 minutos para cada integrante). Ensaiem usando o celular com o Expo Go ou a demonstração no navegador.
 
-## Visão geral do projeto
+---
 
-O TruckFlow é um aplicativo acadêmico para organizar uma oficina de caminhões. O fluxo atual possui:
+## Visão Geral do Projeto (Sprint 3)
 
-- Login administrativo.
-- Cadastro, busca e exclusão de veículos.
-- Abertura e acompanhamento de ordens de serviço.
-- Registro do valor cobrado e do custo de cada ordem.
-- Cálculo automático do lucro de cada serviço.
-- Resumo com faturamento, custos e lucro das ordens concluídas.
+O TruckFlow é um aplicativo desenvolvido na Fábrica de Software para organizar o fluxo operacional e financeiro de oficinas mecânicas de caminhões. Na **Sprint 3**, a equipe evoluiu o aplicativo de um protótipo visual em memória para uma aplicação móvel com engenharia de dados completa:
+- **Persistência Chave-Valor (AsyncStorage):** retenção da sessão administrativa de login, da última aba ativa e cache offline de marcas.
+- **Banco Relacional Embarcado (SQLite):** tabelas físicas não-voláteis de veículos, ordens de serviço e fila técnica de sincronização com transações ACID.
+- **Consumo de APIs REST:** consulta em tempo real à Tabela FIPE oficial (leitura com indicador visual de carregamento) e envio à API remota (escrita).
+- **Arquitetura Offline-First:** funcionamento 100% autônomo sem internet, padrão *Outbox* e sincronização automática transparente quando a conexão retorna.
 
-Os dados são fictícios e ficam apenas na memória do aplicativo. Ao recarregar ou reiniciar, os exemplos iniciais são restaurados.
+---
 
-## 1. Integrante 1 — problema, introdução e login
+## 1. Cauê — Introdução, Login Administrativo e AsyncStorage
 
-Telas: Login e Início.
+**Telas:** Login e Início.  
+**Módulos-chave:** `src/storage/preferences.ts` e `src/screens/LoginScreen.tsx`.
 
-Fala sugerida:
+### Fala sugerida:
+> *"Boa noite, professor e colegas. Nosso aplicativo é o TruckFlow, voltado para modernizar o controle operacional e financeiro de oficinas mecânicas de veículos pesados. Na Sprint 3, eu fiquei responsável pelo módulo de persistência local chave-valor utilizando o AsyncStorage e pelo gerenciamento da sessão do aplicativo.*
+> *No protótipo anterior, os dados eram puramente voláteis e o login era perdido sempre que o aplicativo era fechado. Agora, implementamos o módulo `preferences.ts`. Quando o operador faz o login administrativo com email e senha, suas credenciais e timestamp são gravados fisicamente na memória não-volátil do celular.*
+> *Além disso, o AsyncStorage guarda a última aba navegada e mantém o cache da Tabela FIPE para consultas offline.*
+> *Vou demonstrar: ao acessar com `admin@gmail.com` e senha `123456`, o acesso é liberado. Se fecharmos o aplicativo e abrirmos novamente, a sessão é restaurada de imediato pelo AsyncStorage, sem forçar o usuário a digitar a senha novamente."*
 
-“O TruckFlow é um aplicativo criado para organizar os serviços de uma oficina de caminhões. O acesso começa por uma tela de login administrativo. Depois do login, o usuário pode controlar a frota, acompanhar ordens de serviço e consultar o resultado financeiro da oficina. O projeto foi desenvolvido com React Native e Expo.”
+### Demonstração prática:
+1. Abra a tela de login.
+2. Digite as credenciais de demonstração (`admin@gmail.com` / `123456`).
+3. Mostre o acesso à tela principal e comprove que o login é lembrado após fechar e reabrir o app.
 
-### Demonstração do login
+---
 
-1. Mostre a tela com a mensagem completa “Entre para gerenciar sua oficina”.
-2. Tente entrar deixando um campo vazio e mostre a validação.
-3. Informe uma credencial incorreta e mostre a mensagem “E-mail ou senha incorretos”.
-4. Entre com o único acesso válido:
-   - E-mail: `admin@gmail.com`
-   - Senha: `123456`
-5. Mostre que a senha fica escondida durante a digitação.
-6. Explique que as telas internas e a navegação só aparecem depois do login.
+## 2. Cauã — Frota, Banco de Dados Embarcado (SQLite) e Transações
 
-Código para conhecer: `src/screens/LoginScreen.tsx`, o estado `isAuthenticated` e a função `logout` em `App.tsx`. Para esta demonstração, as credenciais são verificadas localmente e não existe servidor de autenticação.
+**Tela:** Frota.  
+**Módulos-chave:** `src/storage/database.ts` e `src/screens/FleetScreen.tsx`.
 
-Conceitos para entender: `useState` guarda e atualiza os valores dos campos; uma condição no `App.tsx` decide se a tela exibida será o login ou o conteúdo principal; o e-mail é normalizado para letras minúsculas antes da comparação.
+### Fala sugerida:
+> *"Eu fui responsável pelo módulo de banco de dados relacional embarcado utilizando o `expo-sqlite`. O SQLite roda diretamente dentro do dispositivo do mecânico, eliminando qualquer dependência de servidores para armazenar veículos e serviços.*
+> *Modelamos três tabelas relacionais: `vehicles`, `orders` (com chave estrangeira `vehicle_id` e exclusão em cascata) e a tabela técnica `sync_queue`.*
+> *Um ponto técnico crucial foi o uso de transações atômicas com `withTransactionAsync`. Toda vez que um veículo é cadastrado ou removido, a operação no banco de dados e o registro da alteração na fila de sincronização ocorrem dentro da mesma transação. Se houver qualquer falha, o banco realiza rollback automático, impedindo estados inconsistentes.*
+> *Vou demonstrar cadastrando um veículo na frota: o registro é salvo fisicamente no arquivo `truckflow.db` e permanece no celular mesmo se o dispositivo for desligado."*
 
-## 2. Integrante 2 — frota e componentes da interface
+### Demonstração prática:
+1. Navegue até a aba **Frota**.
+2. Mostre os veículos listados do banco SQLite.
+3. Cadastre um novo veículo e comprove que a lista atualiza instantaneamente a partir da tabela do SQLite.
 
-Tela: Frota.
+---
 
-Fala sugerida:
+## 3. Alexandre — Consumo de APIs REST (Tabela FIPE) e Feedback Visual
 
-“Depois do login, podemos cadastrar os veículos atendidos pela oficina. Cada veículo possui placa, modelo e nome do cliente. Também podemos pesquisar um veículo ou removê-lo com uma confirmação de segurança.”
+**Tela:** Modal de Novo Veículo (na aba Frota).  
+**Módulos-chave:** `src/api/client.ts`, `src/api/fipe.ts` e `src/FipePicker.tsx`.
 
-### Demonstração da frota
+### Fala sugerida:
+> *"Eu fiquei responsável pela integração com APIs REST externas e pelo feedback visual de carregamento.*
+> *Integramos o cadastro de veículos à API REST pública da Tabela FIPE de caminhões pesados. Desenvolvemos um cliente HTTP próprio com `AbortController`, definindo um timeout de segurança de 10 segundos para impedir que o aplicativo fique travado caso a rede oscile.*
+> *Ao tocar no botão 'Buscar modelo na Tabela FIPE', uma requisição GET é disparada e o aplicativo exibe em tempo real um indicador giratório (`ActivityIndicator`) com a mensagem 'Consultando a Tabela FIPE...'. Isso dá clareza ao usuário de que a rede está trabalhando.*
+> *O operador seleciona a montadora (como Scania, Volvo ou Mercedes-Benz) e o modelo oficial, que são inseridos automaticamente no formulário. E caso o usuário esteja sem sinal, o sistema utiliza o cache salvo no AsyncStorage para listar as montadoras."*
 
-1. Abra a aba Frota.
-2. Toque em Cadastrar veículo.
-3. Preencha a placa `KLM2N34`, o modelo `Volvo FH 460` e o cliente `Oficina Escola`.
-4. Salve o cadastro e pesquise por `KLM2N34`.
-5. Mostre que o aplicativo verifica campos obrigatórios, formato da placa e placas repetidas.
-6. Explique que a exclusão de um veículo pede confirmação e também remove as ordens ligadas a ele.
+### Demonstração prática:
+1. Abra o cadastro de veículos na aba Frota.
+2. Toque no botão "Buscar modelo na Tabela FIPE".
+3. Aponte o indicador de carregamento giratório na tela.
+4. Escolha uma montadora (ex: Scania) e selecione um modelo para ver os campos preenchidos automaticamente.
 
-Código para conhecer: `src/screens/FleetScreen.tsx` e as funções `addVehicle` e `removeVehicle` em `App.tsx`.
+---
 
-Componentes importantes:
+## 4. Vinícius — Ordens de Serviço, Arquitetura Offline-First e Sincronização
 
-- `TextInput` recebe os dados digitados.
-- `Pressable` cria ações de toque.
-- `View` organiza os elementos da interface.
-- `Text` exibe títulos e informações.
-- `FormModal` apresenta os formulários em uma tela sobreposta.
+**Telas:** Ordens e Início.  
+**Módulos-chave:** `src/api/sync.ts`, `App.tsx` (NetInfo) e `src/screens/HomeScreen.tsx`.
 
-## 3. Integrante 3 — ordens, valores e lucro individual
+### Fala sugerida:
+> *"Minha responsabilidade foi a gestão das ordens de serviço, a Arquitetura Offline-First e a sincronização com o servidor remoto.*
+> *Primeiro, nas ordens de serviço, todos os valores financeiros são calculados e armazenados internamente em centavos como números inteiros. Isso elimina imprecisões de arredondamento de ponto flutuante em JavaScript e garante que faturamento, custos e lucro estejam sempre exatos.*
+> *Segundo, em pátios ou galpões sem sinal de internet, o aplicativo opera no padrão Outbox: qualquer alteração entra no SQLite e na fila `sync_queue`. O `@react-native-community/netinfo` detecta a ausência de rede e exibe o banner 'Modo offline' com a contagem de itens pendentes.*
+> *Assim que a internet retorna, o aplicativo despacha automaticamente a fila via requisições POST para o servidor. Cada item só é removido da fila local após o servidor confirmar com status 201 Created.*
+> *Na tela Início, temos o card de Sincronização com o status Online e o resumo financeiro das ordens concluídas."*
 
-Tela: Ordens.
+### Demonstração prática:
+1. Abra a aba **Ordens** e crie uma nova ordem de serviço com valor e custo, mostrando o lucro previsto.
+2. Mostre o card de **Sincronização** na tela **Início** (badge Online, 0 pendências e horário do último envio).
+3. Conclua uma ordem e mostre a atualização imediata no painel financeiro de **Lucro Realizado**.
 
-Fala sugerida:
+---
 
-“Cada ordem de serviço liga um veículo a um trabalho da oficina. Além da descrição, registramos o valor cobrado do cliente e o custo que a oficina teve. A diferença entre esses dois valores é o lucro da ordem, calculado automaticamente.”
+## Perguntas Prováveis da Banca e do Professor
 
-### Demonstração da ordem de serviço
+1. **"Por que utilizar AsyncStorage e SQLite no mesmo aplicativo?"**  
+   *Resposta:* Princípio da responsabilidade única. O AsyncStorage é otimizado para pares chave-valor sem relacionamentos (sessão do usuário, última aba e cache leve). O SQLite é um banco ACID robusto para dados relacionais complexos, com integridade referencial, chaves estrangeiras e garantia transacional.
 
-1. Toque em Nova ordem de serviço.
-2. Selecione o veículo `KLM2N34`.
-3. Informe o serviço `Revisão preventiva`.
-4. Preencha o valor cobrado, por exemplo `1.500,00`.
-5. Preencha o custo do serviço, por exemplo `850,00`.
-6. Mostre o lucro previsto de `R$ 650,00` antes de criar a ordem.
-7. Crie a ordem e mostre no cartão:
-   - Total da OS.
-   - Custo.
-   - Lucro.
-   - Status atual.
-8. Toque em Iniciar serviço para mudar de Aberta para Em andamento.
-9. Toque em Concluir serviço para mudar de Em andamento para Concluída.
-10. Mostre que uma ordem também pode ser excluída com confirmação.
+2. **"O que acontece se a internet falhar durante a sincronização?"**  
+   *Resposta:* O padrão arquitetural Outbox protege os dados. Um item só é removido da tabela `sync_queue` após receber o código HTTP 201 Created do servidor. Se a conexão cair, a fila permanece salva no SQLite do aparelho e é reenviada na próxima tentativa.
 
-### Regras financeiras da ordem
-
-- O valor cobrado precisa ser maior que zero.
-- O custo pode ser zero, mas não pode ser negativo.
-- O formulário aceita valores no formato brasileiro, como `1.500,00`.
-- O lucro é calculado por `valor cobrado - custo`.
-- Se o custo for maior que o valor cobrado, o resultado negativo aparece em vermelho para indicar prejuízo.
-- Os valores são guardados internamente em centavos para evitar erros de arredondamento.
-
-Código para conhecer: `src/screens/OrdersScreen.tsx`, o tipo `Order` e a função `formatBRL` em `src/data.ts`, além das funções `addOrder`, `advanceOrder` e `removeOrder` em `App.tsx`.
-
-## 4. Integrante 4 — resumo financeiro, organização e encerramento
-
-Tela: Início, depois de concluir a ordem criada na demonstração.
-
-Fala sugerida:
-
-“Ao concluir uma ordem, seus valores entram automaticamente no resumo geral. O aplicativo soma o valor cobrado para calcular o faturamento, soma os custos e mostra o lucro realizado. Ordens abertas ou em andamento ainda não entram nesse resultado porque o serviço não foi finalizado.”
-
-### Demonstração do resumo
-
-1. Volte para a aba Início.
-2. Mostre a quantidade de veículos e de serviços pendentes.
-3. Mostre o cartão de Lucro realizado.
-4. Explique os três resultados:
-   - Faturamento: soma dos valores cobrados nas ordens concluídas.
-   - Custos: soma dos custos das ordens concluídas.
-   - Lucro: faturamento menos custos.
-5. Mostre que os serviços pendentes também exibem o total de cada OS, mas ainda não entram no lucro realizado.
-6. Toque em Sair da conta e mostre o retorno à tela de login.
-
-Código para conhecer: `src/screens/HomeScreen.tsx`. Os cálculos usam `filter` para selecionar somente as ordens concluídas e `reduce` para somar faturamento e custos.
-
-Mostre rapidamente a organização dos arquivos:
-
-| Arquivo | Responsabilidade |
-| --- | --- |
-| `App.tsx` | Controla login, abas e dados compartilhados. |
-| `src/screens/LoginScreen.tsx` | Campos, validação e acesso administrativo. |
-| `src/screens/HomeScreen.tsx` | Resumo geral e resultados financeiros. |
-| `src/screens/FleetScreen.tsx` | Cadastro, busca e exclusão de veículos. |
-| `src/screens/OrdersScreen.tsx` | Criação, valores e andamento das ordens. |
-| `src/data.ts` | Tipos, exemplos iniciais e formatação monetária. |
-| `src/components.tsx` | Botões, campos, status e modal reutilizáveis. |
-| `src/styles.ts` | Cores, tamanhos, espaçamentos e estilos do login. |
-
-Fechamento sugerido:
-
-“O TruckFlow agora cobre o fluxo desde o login e cadastro do veículo até a conclusão e análise financeira da ordem de serviço. Como evolução futura, os dados e a autenticação poderiam ser armazenados em um banco de dados seguro.”
-
-## Como o cálculo funciona
-
-Exemplo de uma ordem:
-
-| Informação | Valor |
-| --- | ---: |
-| Valor cobrado | R$ 1.500,00 |
-| Custo | R$ 850,00 |
-| Lucro | R$ 650,00 |
-
-Se existirem duas ordens concluídas, o resumo soma os valores das duas. Uma ordem que ainda estiver Aberta ou Em andamento continua visível, mas só será contabilizada quando mudar para Concluída.
-
-## Perguntas que podem aparecer
-
-- **Qual é o login?** O único acesso de demonstração é `admin@gmail.com`, com senha `123456`.
-- **O login é seguro para produção?** Não. Ele é local e foi feito para demonstração acadêmica. Em produção, seria necessário um servidor, senhas protegidas e gerenciamento de sessão.
-- **Como o lucro é calculado?** O aplicativo subtrai o custo do valor cobrado em cada ordem.
-- **Por que ordens pendentes não entram no resumo?** Porque o resumo apresenta apenas valores realizados, ou seja, serviços concluídos.
-- **Por que os valores ficam em centavos?** Para evitar imprecisões de números decimais durante os cálculos.
-- **Por que não existe banco de dados?** O foco do exercício é interface, componentes e estado. Os dados em memória são suficientes para a demonstração.
-- **O que acontece ao fechar ou recarregar?** O usuário volta para o login e os veículos e ordens retornam aos exemplos iniciais.
-- **Como as telas conversam?** O `App.tsx` guarda os dados e passa informações e funções para as telas por propriedades, chamadas props.
-- **Por que SDK 57?** O SDK precisa ser compatível com a versão instalada do Expo Go. A versão do SDK e a versão do aplicativo são coisas diferentes.
-- **Vocês usaram IA?** Respondam com honestidade: “Usamos IA como apoio na construção e simplificação. Estudamos o fluxo e estamos aprendendo os componentes.”
-
-## Ensaio antes da aula
-
-- Execute `npm run start:clear` e abra o QR no celular com antecedência.
-- Confirme a compatibilidade do Expo Go com SDK 57 e a conexão na mesma rede.
-- Teste uma credencial incorreta e depois faça o login correto.
-- Cadastre o veículo usado no roteiro.
-- Crie, inicie e conclua uma ordem com valor e custo.
-- Confira se o resumo financeiro mudou depois da conclusão.
-- Teste o botão Sair da conta.
-- Recarregue antes da apresentação para restaurar os três veículos e as três ordens iniciais.
-- Mantenha o servidor rodando e o computador acordado.
-- Deixe um vídeo curto da demonstração como reserva caso a rede da sala falhe.
+3. **"Por que os valores monetários foram modelados em inteiros (centavos)?"**  
+   *Resposta:* Em JavaScript, operações com números de ponto flutuante (`float`) sofrem com imprecisões binárias (ex: `0.1 + 0.2 = 0.30000000000000004`). Armazenar `totalCents` e `costCents` em inteiros elimina totalmente qualquer desvio em centavos nas operações financeiras da oficina.

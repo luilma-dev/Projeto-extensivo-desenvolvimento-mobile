@@ -2,7 +2,7 @@
   "expo": {
     "name": "TruckFlow",
     "slug": "TruckFlow",
-    "version": "2.1.0",
+    "version": "3.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "userInterfaceStyle": "light",
@@ -23,6 +23,9 @@
         "projectId": "7055c825-729f-44ac-a926-797a726e923b"
       }
     },
-    "owner": "fredexs123"
+    "owner": "fredexs123",
+    "plugins": [
+      "expo-sqlite"
+    ]
   }
 }

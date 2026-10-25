@@ -1,10 +1,16 @@
-import { Image, ScrollView, Text, View } from 'react-native';
+import { ActivityIndicator, Image, ScrollView, Text, View } from 'react-native';
 import { version } from '../../package.json';
 import { formatBRL, Order, Tab, Vehicle } from '../data';
 import { Badge, Button } from '../components';
 import { styles as s } from '../styles';
 
-export function HomeScreen({ vehicles, orders, onNavigate, onLogout }: { vehicles: Vehicle[]; orders: Order[]; onNavigate: (tab: Tab) => void; onLogout: () => void }) {
+export type SyncState = { isOnline: boolean; isSyncing: boolean; pending: number; lastSync: string | null; message: string };
+
+function formatDate(iso: string | null) {
+  return iso ? new Date(iso).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' }) : 'nunca';
+}
+
+export function HomeScreen({ vehicles, orders, sync, onSync, onNavigate, onLogout }: { vehicles: Vehicle[]; orders: Order[]; sync: SyncState; onSync: () => void; onNavigate: (tab: Tab) => void; onLogout: () => void }) {
   const pending = orders.filter(order => order.status !== 'Concluída');
   const completedOrders = orders.filter(order => order.status === 'Concluída');
   const revenueCents = completedOrders.reduce((sum, order) => sum + order.totalCents, 0);
@@ -31,6 +37,20 @@ export function HomeScreen({ vehicles, orders, onNavigate, onLogout }: { vehicle
       </View>
     </View>
     <View style={s.card}>
+      <View style={s.between}>
+        <Text style={s.heading}>Sincronização</Text>
+        <View style={[s.badge, { backgroundColor: sync.isOnline ? '#E8F7EE' : '#FEE2E2' }]}>
+          <Text style={[s.badgeText, { color: sync.isOnline ? '#18723C' : '#B42318' }]}>{sync.isOnline ? '● Online' : '● Offline'}</Text>
+        </View>
+      </View>
+      <Text style={s.text}>{sync.pending === 0 ? 'Todos os dados estão salvos no servidor.' : `${sync.pending} alteração(ões) salva(s) no aparelho aguardando envio.`}</Text>
+      <Text style={s.subtitle}>Última sincronização: {formatDate(sync.lastSync)}</Text>
+      {sync.isSyncing
+        ? <View style={s.syncing}><ActivityIndicator color="#007AFF" /><Text style={s.secondaryText}>Enviando dados ao servidor...</Text></View>
+        : <Button title="Sincronizar agora" onPress={onSync} secondary />}
+      {!!sync.message && !sync.isSyncing && <Text style={s.subtitle}>{sync.message}</Text>}
+    </View>
+    <View style={s.card}>
       <Text style={s.heading}>Tudo em um só lugar</Text>
       <Text style={s.text}>Cadastre um veículo e acompanhe o serviço até a conclusão.</Text>
       <Button title="Ver ordens de serviço" onPress={() => onNavigate('Ordens')} />
@@ -44,6 +64,6 @@ export function HomeScreen({ vehicles, orders, onNavigate, onLogout }: { vehicle
       <Text style={s.orderTotal}>Total da OS: {formatBRL(order.totalCents)}</Text>
     </View>)}
     <Button title="Sair da conta" onPress={onLogout} secondary />
-    <Text style={s.subtitle}>TruckFlow {version} · Demonstração acadêmica{'\n'}Dados fictícios. Ao recarregar o app, os exemplos são restaurados.</Text>
+    <Text style={s.subtitle}>TruckFlow {version} · Demonstração acadêmica{'\n'}Dados salvos no aparelho (SQLite) e sincronizados via API REST.</Text>
   </ScrollView>;
 }
